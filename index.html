@@ -58,14 +58,25 @@
     }
     
     #editor {
-      max-width: 900px;
+      max-width: 750px;
       margin: 0 auto;
       background: white;
-      padding: 64px 80px;
+      padding: 48px 60px;
       border-radius: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
       min-height: 600px;
       line-height: 1.7;
+    }
+    
+    @media (max-width: 768px) {
+      #editor {
+        max-width: 100%;
+        padding: 32px 24px;
+        border-radius: 0;
+      }
+      #editor-container {
+        padding: 0;
+      }
     }
     
     /* Milkdown 编辑器样式覆盖 */
@@ -164,7 +175,7 @@
       color: #80868b;
       font-size: 16px;
       background: white;
-      max-width: 900px;
+      max-width: 750px;
       margin: 0 auto;
     }
     
