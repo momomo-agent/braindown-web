@@ -134,6 +134,19 @@ dropZone.ondrop = (e) => {
   }
 };
 
+// 全局拖拽支持（编辑器打开后也能拖拽）
+document.body.ondragover = (e) => {
+  e.preventDefault();
+};
+
+document.body.ondrop = (e) => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && file.name.match(/\.(md|markdown)$/i)) {
+    openFile(file);
+  }
+};
+
 // 页面加载时自动显示欢迎页
 window.addEventListener('DOMContentLoaded', () => {
   currentFilename = 'welcome.md';
