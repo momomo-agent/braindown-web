@@ -1,0 +1,20 @@
+{
+  "name": "braindown-web",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@milkdown/core": "^7.3.6",
+    "@milkdown/ctx": "^7.3.6",
+    "@milkdown/preset-commonmark": "^7.3.6",
+    "@milkdown/preset-gfm": "^7.3.6",
+    "@milkdown/theme-nord": "^7.3.6",
+    "@milkdown/plugin-listener": "^7.3.6"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
