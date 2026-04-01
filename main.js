@@ -2,6 +2,7 @@ import { Editor, rootCtx, defaultValueCtx } from '@milkdown/core';
 import { commonmark } from '@milkdown/preset-commonmark';
 import { gfm } from '@milkdown/preset-gfm';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
+import { diagram } from '@milkdown/plugin-diagram';
 
 let editor = null;
 let currentFilename = '';
@@ -76,6 +77,7 @@ async function initEditor(markdown = welcomeMarkdown) {
     .use(commonmark)
     .use(gfm)
     .use(listener)
+    .use(diagram)
     .create();
   
   currentContent = markdown;
