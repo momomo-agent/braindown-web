@@ -2,6 +2,7 @@ import { Editor, rootCtx, defaultValueCtx } from '@milkdown/core';
 import { commonmark } from '@milkdown/preset-commonmark';
 import { gfm } from '@milkdown/preset-gfm';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
+import mermaid from 'mermaid';
 
 let editor = null;
 let currentFilename = '';
@@ -11,6 +12,29 @@ const dropZone = document.getElementById('drop-zone');
 const editorEl = document.getElementById('editor');
 const filenameEl = document.getElementById('filename');
 const fileInput = document.getElementById('file-input');
+
+// 初始化 Mermaid
+mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+// 渲染 Mermaid 图表
+async function renderMermaid() {
+  const codeBlocks = editorEl.querySelectorAll('pre code.language-mermaid');
+  for (let i = 0; i < codeBlocks.length; i++) {
+    const code = codeBlocks[i];
+    const pre = code.parentElement;
+    const mermaidCode = code.textContent;
+    
+    try {
+      const { svg } = await mermaid.render(`mermaid-${i}`, mermaidCode);
+      const div = document.createElement('div');
+      div.className = 'mermaid-diagram';
+      div.innerHTML = svg;
+      pre.replaceWith(div);
+    } catch (e) {
+      console.error('Mermaid render error:', e);
+    }
+  }
+}
 
 const welcomeMarkdown = `# 欢迎使用 BrainDown
 
@@ -79,6 +103,9 @@ async function initEditor(markdown = welcomeMarkdown) {
     .create();
   
   currentContent = markdown;
+  
+  // 渲染 Mermaid 图表
+  setTimeout(() => renderMermaid(), 100);
 }
 
 // 打开文件
