@@ -16,22 +16,62 @@ const fileInput = document.getElementById('file-input');
 // 初始化 Mermaid
 mermaid.initialize({ startOnLoad: false, theme: 'default' });
 
+let mermaidCounter = 0;
+
 // 渲染 Mermaid 图表
 async function renderMermaid() {
-  const codeBlocks = editorEl.querySelectorAll('pre code.language-mermaid');
+  // 尝试多种选择器匹配 Milkdown 渲染的代码块
+  const selectors = [
+    'pre code.language-mermaid',
+    'pre[data-language="mermaid"] code',
+    'code[data-language="mermaid"]',
+    'pre[class*="mermaid"] code',
+  ];
+  
+  let codeBlocks = [];
+  for (const sel of selectors) {
+    codeBlocks = editorEl.querySelectorAll(sel);
+    if (codeBlocks.length > 0) break;
+  }
+  
+  // 如果上面的都没匹配到，遍历所有 pre > code 看内容是否像 mermaid
+  if (codeBlocks.length === 0) {
+    const allPres = editorEl.querySelectorAll('pre');
+    const mermaidPres = [];
+    allPres.forEach(pre => {
+      const code = pre.querySelector('code');
+      if (!code) return;
+      const text = code.textContent.trim();
+      // 检查是否有 data-type="mermaid" 或 data-language="mermaid"
+      if (pre.dataset.language === 'mermaid' || pre.dataset.type === 'mermaid' ||
+          code.dataset.language === 'mermaid' || code.dataset.type === 'mermaid') {
+        mermaidPres.push(code);
+        return;
+      }
+      // 检查内容是否像 mermaid 语法
+      if (/^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|gitGraph|mindmap|timeline)\b/m.test(text)) {
+        mermaidPres.push(code);
+      }
+    });
+    codeBlocks = mermaidPres;
+  }
+  
   for (let i = 0; i < codeBlocks.length; i++) {
-    const code = codeBlocks[i];
-    const pre = code.parentElement;
-    const mermaidCode = code.textContent;
+    const code = codeBlocks[i] instanceof HTMLElement ? codeBlocks[i] : codeBlocks[i];
+    const pre = code.closest('pre') || code.parentElement;
+    const mermaidCode = code.textContent.trim();
     
     try {
-      const { svg } = await mermaid.render(`mermaid-${i}`, mermaidCode);
+      const id = `mermaid-${Date.now()}-${mermaidCounter++}`;
+      const { svg } = await mermaid.render(id, mermaidCode);
       const div = document.createElement('div');
       div.className = 'mermaid-diagram';
       div.innerHTML = svg;
+      // 保存原始代码，双击可编辑
+      div.dataset.mermaidCode = mermaidCode;
       pre.replaceWith(div);
     } catch (e) {
-      console.error('Mermaid render error:', e);
+      console.error('Mermaid render error:', e, mermaidCode);
     }
   }
 }
@@ -104,8 +144,8 @@ async function initEditor(markdown = welcomeMarkdown) {
   
   currentContent = markdown;
   
-  // 渲染 Mermaid 图表
-  setTimeout(() => renderMermaid(), 100);
+  // 渲染 Mermaid 图表（等 Milkdown 渲染完）
+  setTimeout(() => renderMermaid(), 500);
 }
 
 // 打开文件
